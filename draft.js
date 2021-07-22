@@ -2,6 +2,7 @@ const axios = require('axios');
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 const tough = require('tough-cookie');
 const puppeteer = require('puppeteer');
+const chromiumServerless = require('chrome-aws-lambda');
 const rateLimit = require('axios-rate-limit');
 
 const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36w";
@@ -190,7 +191,7 @@ module.exports = function (config = {}) {
         all: "all"
     };
 
-    module.login = function (username, password) {
+    module.login = function (username, password, isServerless) {
         return new Promise(async (resolve, reject) => {
 
             const sharedCookieJar = new tough.CookieJar();
@@ -198,7 +199,7 @@ module.exports = function (config = {}) {
             loginAxios.defaults.jar = sharedCookieJar;
 
             const cookies = {};
-            const browser = await puppeteer.launch();
+            const browser = isServerless ? await chromiumServerless.puppeteer.launch() : await puppeteer.launch();
             const page = await browser.newPage();
 
             await page.goto("https://profile.callofduty.com/cod/login");
