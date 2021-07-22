@@ -2,6 +2,7 @@ const axios = require('axios');
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 const tough = require('tough-cookie');
 const puppeteer = require('puppeteer');
+const chromiumServerless = require('chrome-aws-lambda');
 
 const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36w";
 let baseCookie = "new_SiteId=cod; ACT_SSO_LOCALE=en_US;country=US;";
@@ -153,7 +154,7 @@ class helpers {
     }
 }
 
-module.exports.login = (username, password) => {
+module.exports.login = (username, password, isServerless) => {
 
     _helpers = new helpers();
 
@@ -171,7 +172,7 @@ module.exports.login = (username, password) => {
 
     return new Promise(async(resolve, reject) => {
         const cookies = {};
-        const browser = await puppeteer.launch();
+        const browser = isServerless ? await chromiumServerless.puppeteer.launch() : await puppeteer.launch();
         const page = await browser.newPage();
 
         await page.goto("https://profile.callofduty.com/cod/login");
